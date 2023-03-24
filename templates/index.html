@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <title>MATIC Balance Checker</title>
+    <script>
+    async function fetchMaticBalance(address) {
+    const response = await fetch(`/balance?address=${address}`);
+    const data = await response.json();
+    document.getElementById('balance').innerText = `MATIC Balance: ${data.balance}`;
+}
+
+
+    async function connectWallet() {
+        console.log("Connect Wallet button clicked");
+        if (window.ethereum) {
+            console.log("Ethereum object detected");
+            try {
+                console.log("Requesting accounts access");
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("Accounts access granted");
+
+                console.log("Requesting accounts list");
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                console.log("Accounts list received:", accounts);
+
+                document.getElementById('connectedAddress').innerText = `Connected Address: ${accounts[0]}`;
+            } catch (error) {
+                console.error("Error connecting to wallet:", error);
+                alert("Error connecting to wallet. Please make sure your wallet extension is enabled and try again.");
+            }
+        } else {
+            console.log("No Ethereum wallet detected");
+            alert("No Ethereum wallet detected. Please install a wallet extension like MetaMask or Coinbase Wallet and try again.");
+        }
+    }
+
+    function addConnectWalletListener() {
+        document.getElementById("connectWalletButton").addEventListener("click", connectWallet);
+    }
+
+    window.onload = addConnectWalletListener;
+</script>
+
+
+</head>
+<body>
+    <h1>MATIC Balance Checker</h1>
+    <button onclick="fetchMaticBalance(document.getElementById('connectedAddress').innerText.split(': ')[1])">Check Balance</button>
+    <p id="balance"></p>
+    <button id="connectWalletButton">Connect Wallet</button>
+    <p id="connectedAddress"></p>
+</body>
+</html>
